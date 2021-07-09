@@ -36,16 +36,19 @@ func GetPostIds(subreddit string) NamesAndIds {
 	// url = url + subreddit + "/" + "new.json"
 	url := baseUrl + subreddit + "/" + "new.json"
 
-	req, err := http.NewRequest("GET", url, nil)
-	utils.CheckError(err)
+	// req, err := http.NewRequest("GET", url, nil)
+	// utils.CheckError(err)
 
-	req.Header.Set("User-Agent", "My_unique_user_agent")
+	// req.Header.Set("User-Agent", "My_unique_user_agent")
 
-	res, err := http.DefaultClient.Do(req)
-	utils.CheckError(err)
+	// res, err := http.DefaultClient.Do(req)
+	// utils.CheckError(err)
 
-	body, err := ioutil.ReadAll(res.Body)
-	utils.CheckError(err)
+	// body, err := ioutil.ReadAll(res.Body)
+	// utils.CheckError(err)
+	header := utils.Header{Key:"User-Agent", Value:"My_unique_user_agent"}
+	headers := []utils.Header{header}
+	body := utils.GetRequestBody(url, "GET", headers)
 
 	result := Post{}
 	json.Unmarshal([]byte(body), &result)
@@ -86,14 +89,6 @@ func getCommentsSinglePost(nid NameAndId, subreddit string, c chan string) []str
 
 	return result
 }
-
-// func (nids NamesAndIds) getCommentsManyPosts(c chan string, subrettit string) {
-// 	for _, nid := range nids {
-// 		go getCommentsSinglePost(nid, "Bitcoin", c)
-// 	}
-// 	// time.Sleep(4 * time.Second)
-// 	// close(c)
-// }
 
 func (nids NamesAndIds) GetCommentsManyPosts(subrettit string) []string {
 	var result []string

@@ -6,6 +6,7 @@ import (
 	"text/template"
 
 	"github.com/gorilla/mux"
+	coingecko "github.com/piotrksiazek/fomo-sapiens/coingecko"
 	reddit "github.com/piotrksiazek/fomo-sapiens/reddit"
 )
 
@@ -31,4 +32,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	nids := reddit.GetPostIds("Bitcoin")
 	comments := nids.GetCommentsManyPosts("Bitcoin")
 	fmt.Println(reddit.GetSentiment(comments))
+
+	fmt.Println(coingecko.GetCurrentPrice("ethereum", "usd"))
 }
