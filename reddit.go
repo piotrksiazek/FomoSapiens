@@ -26,8 +26,10 @@ type NameAndId struct {
 	Id string
 }
 
+type NamesAndIds []NameAndId
 
-func getPostIds(subreddit string) []NameAndId {
+
+func getPostIds(subreddit string) NamesAndIds {
 	// url = url + subreddit + "/" + "new.json"
 	url := baseUrl + subreddit + "/" + "new.json"
 
@@ -45,7 +47,7 @@ func getPostIds(subreddit string) []NameAndId {
 	result := Post{}
 	json.Unmarshal([]byte(body), &result)
 
-	var ids []NameAndId
+	var ids NamesAndIds
 
 	for _, post := range result.Data.Children {
 		nid := NameAndId{}
@@ -57,7 +59,7 @@ func getPostIds(subreddit string) []NameAndId {
 	return ids
 }
 
-func getComments(nid NameAndId, subreddit string, c chan string) []string {
+func getCommentsSinglePost(nid NameAndId, subreddit string, c chan string) []string {
 	var url string = baseUrl + subreddit + "/comments/" + nid.Id + "/" + nid.Name + ".json"
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -76,12 +78,33 @@ func getComments(nid NameAndId, subreddit string, c chan string) []string {
 
 	var result []string
 	for _, v := range matches {
-		// result = append(result, v[1])
 		c <- v[1]
-		// fmt.Println(v[1])
 	}
 
-	// close(c)
+	return result
+}
 
+// func (nids NamesAndIds) getCommentsManyPosts(c chan string, subrettit string) {
+// 	for _, nid := range nids {
+// 		go getCommentsSinglePost(nid, "Bitcoin", c)
+// 	}
+// 	// time.Sleep(4 * time.Second)
+// 	// close(c)
+// }
+
+func (nids NamesAndIds) getCommentsManyPosts(subrettit string) []string {
+	var result []string
+	c := make(chan string)
+
+	for _, nid := range nids {
+		go func(ch chan string, n NameAndId) {
+				getCommentsSinglePost(n, "Bitcoin", ch)
+				// fmt.Println(<-ch)
+			}(c, nid)
+		}
+	for i:=0; i<len(nids); i++ {
+		var comment string = <-c
+		result = append(result, comment)
+	}
 	return result
 }

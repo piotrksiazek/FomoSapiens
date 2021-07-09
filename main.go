@@ -28,14 +28,11 @@ func main() {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.html", nil)
 	nids := getPostIds("Bitcoin")
-	c := make(chan string)
-	for _, nid := range nids {
-		// time.Sleep(2 * time.Second)
-		fmt.Println("===================") 
-		go getComments(nid, "Bitcoin", c)
-	}
-
-	for msg := range c {
-		fmt.Println(msg)
-	}
+	// c := make(chan string)
+	// nids.getCommentsManyPosts(c, "Bitcoin")
+	fmt.Println(nids.getCommentsManyPosts("Bitcoin"))
+	fmt.Println("\n\t================================ENDED======================================")
+	// for msg := range c {
+	// 	fmt.Println(msg)
+	// }
 }
