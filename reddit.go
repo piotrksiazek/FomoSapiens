@@ -5,6 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"time"
+
+	"github.com/cdipaolo/sentiment"
 )
 
 var baseUrl string = "https://www.reddit.com/r/"
@@ -97,6 +100,7 @@ func (nids NamesAndIds) getCommentsManyPosts(subrettit string) []string {
 	c := make(chan string)
 
 	for _, nid := range nids {
+		time.Sleep(time.Second * 2) //avoid being blocked by reddit for too frequent requests
 		go func(ch chan string, n NameAndId) {
 				getCommentsSinglePost(n, "Bitcoin", ch)
 				// fmt.Println(<-ch)
@@ -107,4 +111,21 @@ func (nids NamesAndIds) getCommentsManyPosts(subrettit string) []string {
 		result = append(result, comment)
 	}
 	return result
+}
+
+func getSentiment(comments []string) int {
+	model, err := sentiment.Restore()
+	if err != nil {
+		panic(err)
+	}
+
+	var analysis *sentiment.Analysis
+	sentimentAccum := 0
+	for _, comment := range comments{
+		analysis = model.SentimentAnalysis(comment, sentiment.English)
+		if analysis.Score == 1{
+			sentimentAccum++
+		}
+	}
+	return len(comments)
 }

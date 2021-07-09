@@ -30,8 +30,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	nids := getPostIds("Bitcoin")
 	// c := make(chan string)
 	// nids.getCommentsManyPosts(c, "Bitcoin")
-	fmt.Println(nids.getCommentsManyPosts("Bitcoin"))
-	fmt.Println("\n\t================================ENDED======================================")
+	comments := nids.getCommentsManyPosts("Bitcoin")
+	fmt.Println(getSentiment(comments))
 	// for msg := range c {
 	// 	fmt.Println(msg)
 	// }
