@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -58,7 +57,7 @@ func getPostIds(subreddit string) []NameAndId {
 	return ids
 }
 
-func getComments(nid NameAndId, subreddit string) []string {
+func getComments(nid NameAndId, subreddit string, c chan string) []string {
 	var url string = baseUrl + subreddit + "/comments/" + nid.Id + "/" + nid.Name + ".json"
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -77,11 +76,12 @@ func getComments(nid NameAndId, subreddit string) []string {
 
 	var result []string
 	for _, v := range matches {
-		result = append(result, v[1])
-		fmt.Println(v[1])
+		// result = append(result, v[1])
+		c <- v[1]
+		// fmt.Println(v[1])
 	}
+
+	// close(c)
 
 	return result
 }
-
-// "body"\s*:\s*"([^"]+)

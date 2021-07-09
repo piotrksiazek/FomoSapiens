@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"text/template"
-	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -29,9 +28,14 @@ func main() {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.html", nil)
 	nids := getPostIds("Bitcoin")
-	for index, nid := range nids {
-		time.Sleep(2 * time.Second)
-		fmt.Println("===================" + string(index) + "================") 
-		getComments(nid, "Bitcoin")
+	c := make(chan string)
+	for _, nid := range nids {
+		// time.Sleep(2 * time.Second)
+		fmt.Println("===================") 
+		go getComments(nid, "Bitcoin", c)
+	}
+
+	for msg := range c {
+		fmt.Println(msg)
 	}
 }
