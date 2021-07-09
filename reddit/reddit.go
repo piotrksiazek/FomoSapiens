@@ -1,13 +1,13 @@
-package main
+package reddit
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"regexp"
-	"time"
 
 	"github.com/cdipaolo/sentiment"
+	utils "github.com/piotrksiazek/fomo-sapiens/utils"
 )
 
 var baseUrl string = "https://www.reddit.com/r/"
@@ -32,20 +32,20 @@ type NameAndId struct {
 type NamesAndIds []NameAndId
 
 
-func getPostIds(subreddit string) NamesAndIds {
+func GetPostIds(subreddit string) NamesAndIds {
 	// url = url + subreddit + "/" + "new.json"
 	url := baseUrl + subreddit + "/" + "new.json"
 
 	req, err := http.NewRequest("GET", url, nil)
-	checkError(err)
+	utils.CheckError(err)
 
 	req.Header.Set("User-Agent", "My_unique_user_agent")
 
 	res, err := http.DefaultClient.Do(req)
-	checkError(err)
+	utils.CheckError(err)
 
 	body, err := ioutil.ReadAll(res.Body)
-	checkError(err)
+	utils.CheckError(err)
 
 	result := Post{}
 	json.Unmarshal([]byte(body), &result)
@@ -66,15 +66,15 @@ func getCommentsSinglePost(nid NameAndId, subreddit string, c chan string) []str
 	var url string = baseUrl + subreddit + "/comments/" + nid.Id + "/" + nid.Name + ".json"
 
 	req, err := http.NewRequest("GET", url, nil)
-	checkError(err)
+	utils.CheckError(err)
 
 	req.Header.Set("User-Agent", "Hello_me")
 
 	res, err := http.DefaultClient.Do(req)
-	checkError(err)
+	utils.CheckError(err)
 
 	body, err := ioutil.ReadAll(res.Body)
-	checkError(err)
+	utils.CheckError(err)
 	
 	r := regexp.MustCompile(`"body"\s*:\s*"([^"]+)`)
 	matches := r.FindAllStringSubmatch(string(body), -1)
@@ -95,12 +95,12 @@ func getCommentsSinglePost(nid NameAndId, subreddit string, c chan string) []str
 // 	// close(c)
 // }
 
-func (nids NamesAndIds) getCommentsManyPosts(subrettit string) []string {
+func (nids NamesAndIds) GetCommentsManyPosts(subrettit string) []string {
 	var result []string
 	c := make(chan string)
 
 	for _, nid := range nids {
-		time.Sleep(time.Second * 2) //avoid being blocked by reddit for too frequent requests
+		// time.Sleep(time.Second * 2) //avoid being blocked by reddit for too frequent requests
 		go func(ch chan string, n NameAndId) {
 				getCommentsSinglePost(n, "Bitcoin", ch)
 				// fmt.Println(<-ch)
@@ -113,7 +113,7 @@ func (nids NamesAndIds) getCommentsManyPosts(subrettit string) []string {
 	return result
 }
 
-func getSentiment(comments []string) int {
+func GetSentiment(comments []string) int {
 	model, err := sentiment.Restore()
 	if err != nil {
 		panic(err)
@@ -127,5 +127,6 @@ func getSentiment(comments []string) int {
 			sentimentAccum++
 		}
 	}
-	return len(comments)
+	totalNumberOfComments := len(comments)
+	return int((float64(sentimentAccum)/float64(totalNumberOfComments))*100)
 }

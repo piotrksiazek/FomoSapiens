@@ -6,6 +6,7 @@ import (
 	"text/template"
 
 	"github.com/gorilla/mux"
+	reddit "github.com/piotrksiazek/fomo-sapiens/reddit"
 )
 
 var templates *template.Template
@@ -27,12 +28,7 @@ func main() {
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.html", nil)
-	nids := getPostIds("Bitcoin")
-	// c := make(chan string)
-	// nids.getCommentsManyPosts(c, "Bitcoin")
-	comments := nids.getCommentsManyPosts("Bitcoin")
-	fmt.Println(getSentiment(comments))
-	// for msg := range c {
-	// 	fmt.Println(msg)
-	// }
+	nids := reddit.GetPostIds("Bitcoin")
+	comments := nids.GetCommentsManyPosts("Bitcoin")
+	fmt.Println(reddit.GetSentiment(comments))
 }
