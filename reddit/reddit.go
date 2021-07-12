@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"time"
 
 	"github.com/cdipaolo/sentiment"
 	utils "github.com/piotrksiazek/fomo-sapiens/utils"
@@ -32,21 +33,10 @@ type NamesAndIds []NameAndId
 
 
 func GetPostIds(subreddit string, args utils.RequestArgs) NamesAndIds {
-	// url := baseUrl + subreddit + "/" + "new.json"
 	url := baseUrl + subreddit + "/" + "new" + ".json"
 	url = utils.AddRequestArgs(url, args)
 	fmt.Println(url)
 
-	// req, err := http.NewRequest("GET", url, nil)
-	// utils.CheckError(err)
-
-	// req.Header.Set("User-Agent", "My_unique_user_agent")
-
-	// res, err := http.DefaultClient.Do(req)
-	// utils.CheckError(err)
-
-	// body, err := ioutil.ReadAll(res.Body)
-	// utils.CheckError(err)
 	header := utils.Header{Key:"User-Agent", Value:"My_unique_user_agent"}
 	headers := []utils.Header{header}
 	body := utils.GetRequestBody(url, "GET", headers)
@@ -69,16 +59,6 @@ func GetPostIds(subreddit string, args utils.RequestArgs) NamesAndIds {
 func getCommentsSinglePost(nid NameAndId, subreddit string, c chan string) []string {
 	var url string = baseUrl + subreddit + "/comments/" + nid.Id + "/" + nid.Name + ".json"
 
-	// req, err := http.NewRequest("GET", url, nil)
-	// utils.CheckError(err)
-
-	// req.Header.Set("User-Agent", "Hello_me")
-
-	// res, err := http.DefaultClient.Do(req)
-	// utils.CheckError(err)
-
-	// body, err := ioutil.ReadAll(res.Body)
-	// utils.CheckError(err)
 	header := utils.Header{Key:"User-Agent", Value:"My_unique_user_agent"}
 	headers := []utils.Header{header}
 	body := utils.GetRequestBody(url, "GET", headers)
@@ -99,10 +79,9 @@ func (nids NamesAndIds) GetCommentsManyPosts(subrettit string) []string {
 	c := make(chan string)
 
 	for _, nid := range nids {
-		// time.Sleep(time.Second * 1) //avoid being blocked by reddit for too frequent requests
+		time.Sleep(time.Second * 2) //avoid being blocked by reddit for too frequent requests
 		go func(ch chan string, n NameAndId) {
 				getCommentsSinglePost(n, "Bitcoin", ch)
-				// fmt.Println(<-ch)
 			}(c, nid)
 		}
 	for i:=0; i<len(nids); i++ {
@@ -112,7 +91,7 @@ func (nids NamesAndIds) GetCommentsManyPosts(subrettit string) []string {
 	return result
 }
 
-func GetSentiment(comments []string) int {
+func GetSentiment(comments []string) int { //returns percentage of positive-sentiment comments
 	model, err := sentiment.Restore()
 	if err != nil {
 		panic(err)

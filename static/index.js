@@ -1,38 +1,74 @@
-let chart = document.getElementById("myChart").getContext("2d");
+const priceChart = document.getElementById("priceChart").getContext("2d");
+const sentimentChart = document
+  .getElementById("sentimentChart")
+  .getContext("2d");
 
-var myChart = new Chart(chart, {
-  type: "line",
-  data: {
-    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-    datasets: [
-      {
-        label: "# of Votes",
-        data: [12, 19, 3, 5, 2, 3],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
+const defaultNumverOfDaysToFetch = 180;
+
+const usdPrice = [];
+const sentiment = [];
+const days = [];
+
+// for (let i = 0; i < defaultNumverOfDaysToFetch; i++) {
+//   days.push(i.toString());
+// }
+const formatter = new Intl.DateTimeFormat("pl");
+axios
+  .get(`getDays/${defaultNumverOfDaysToFetch}`)
+  .then((response) => {
+    response.data.forEach((day) => {
+      usdPrice.push(day.realprice);
+      sentiment.push(day.sentiment);
+
+      date = Date.parse(day.creationday);
+      days.push(formatter.format(date));
+    });
+    var chart1 = new Chart(priceChart, {
+      type: "line",
+      data: {
+        labels: days,
+        datasets: [
+          {
+            label: "BTC price in USD",
+            yAxisID: "price",
+            data: usdPrice,
+            fill: false,
+            borderColor: "gold",
+            tension: 0.1,
+          },
+          {
+            label: "Reddit sentiment",
+            yAxisID: "sentiment",
+            data: sentiment,
+            fill: false,
+            borderColor: "red",
+            tension: 0.1,
+          },
         ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 1,
       },
-    ],
-  },
-  options: {
-    scales: {
-      y: {
-        beginAtZero: true,
+      options: {
+        responsive: true, // Instruct chart js to respond nicely.
+        maintainAspectRatio: false, // Add to prevent default behaviour of full-width/height
+        scales: {
+          sentiment: {
+            type: "linear",
+            display: true,
+            position: "left",
+            max: 50,
+            min: 30,
+          },
+          price: {
+            type: "linear",
+            display: true,
+            position: "right",
+
+            // grid line settings
+            grid: {
+              drawOnChartArea: false, // only want the grid lines for one axis to show up
+            },
+          },
+        },
       },
-    },
-  },
-});
+    });
+  })
+  .catch((error) => console.log(error));

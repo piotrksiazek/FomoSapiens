@@ -6,6 +6,7 @@ require (
 	github.com/cdipaolo/goml v0.0.0-20190412180403-e1f51f713598 // indirect
 	github.com/cdipaolo/sentiment v0.0.0-20200617002423-c697f64e7f10
 	github.com/gorilla/mux v1.8.0
+	github.com/onatm/clockwerk v0.0.0-20190910145222-354c9bd6cf28
 	github.com/tidwall/gjson v1.8.1
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/vartanbeno/go-reddit/v2 v2.0.1 // indirect
