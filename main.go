@@ -91,7 +91,7 @@ func getTopSubmissionHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(t.Month())
 
 	howManyDaysAgo := int(time.Now().Sub(t).Hours() / 24) 
-	post := reddit.GetTopPostFromDay(howManyDaysAgo)
+	post := reddit.GetTopCommentFromDay(howManyDaysAgo)
 	
 
 	json.NewEncoder(w).Encode(post)

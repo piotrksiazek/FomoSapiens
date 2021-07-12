@@ -123,7 +123,7 @@ type PushiftPosts struct {
 	}`json:"data"`
 }
 
-func GetTopPostFromDay(d int) PushiftPost { //d says from how many days ago should the post be searched
+func GetTopCommentFromDay(d int) PushiftPost { //d says from how many days ago should the post be searched
 	after := strconv.Itoa(d) //parse d int to d in string format
 	before := strconv.Itoa(d-1)
 	url:= "https://api.pushshift.io/reddit/search/comment/?subreddit=Bitcoin&subreddit=CryptoCurrency&after=" + after + "d&before=" + before +"d&size=500"
@@ -133,7 +133,8 @@ func GetTopPostFromDay(d int) PushiftPost { //d says from how many days ago shou
 
 	var max int
 	var maxIndex int
-	fmt.Println(len(posts.Data))
+
+	//find comment with the highest score among others
 	for index, content := range posts.Data {
 		fmt.Println(content.Body)
 		tmp := content.PushiftPost.Score
