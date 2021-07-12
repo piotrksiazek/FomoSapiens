@@ -106,13 +106,16 @@ chartButton.addEventListener("click", () => {
 const redditCommentDiv = document.getElementById("redditComment");
 
 submissionButton.addEventListener("click", () => {
-  axios.get(`getTopSubmission/${date.value}`).then((response) => {
-    console.log(response);
-    redditCommentDiv.innerHTML = `
+  axios
+    .get(`getTopSubmission/${date.value}`)
+    .then((response) => {
+      console.log(response);
+      redditCommentDiv.innerHTML = `
       <h3>${response.data.author}</h3>
       <p>${response.data.body}</p>
     `;
-  });
+    })
+    .catch((err) => console.log(err));
 });
 
 createChart(defaultNumverOfDaysToFetch);
