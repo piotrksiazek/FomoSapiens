@@ -36,7 +36,6 @@ func GetCurrentPrice(crypto string, currency string) int {
 }
 
 func GetHistoricalPrice(crypto string, currency string, date Date) int {
-	//coins/bitcoin/history?date=30-12-2017
 	url := baseUrl + "coins/" + crypto + "/history?" + "date=" + date.String()
 	body := utils.GetRequestBody(url, "GET", nil)
 

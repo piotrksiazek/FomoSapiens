@@ -9,9 +9,6 @@ const usdPrice = [];
 const sentiment = [];
 const days = [];
 
-// for (let i = 0; i < defaultNumverOfDaysToFetch; i++) {
-//   days.push(i.toString());
-// }
 const formatter = new Intl.DateTimeFormat("pl");
 axios
   .get(`getDays/${defaultNumverOfDaysToFetch}`)

@@ -47,7 +47,7 @@ func main() {
 	http.ListenAndServe(":8080", r)
 }
 
-//
+
 func (d DailyJob) Run() {
 	args := utils.RequestArgs{"after" : "2d", "before": "1d", "limit" : "100"}
 	nids := reddit.GetPostIds("Bitcoin", args)
@@ -55,7 +55,7 @@ func (d DailyJob) Run() {
 	sentiment := reddit.GetSentiment(comments)
 
 	price := coingecko.GetCurrentPrice("bitcoin", "usd")
-	predictedPrice := 34000
+	predictedPrice := 0
 	
 	day := models.Day{CreationDay: time.Now(), RealPrice: price, PredictedPrice: predictedPrice, Sentiment: sentiment}
 	db.Create(&day)
@@ -78,7 +78,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.html", nil)
 }
 
-func populateWithHistoricalData(howManyDays int) {
+func populateWithHistoricalData(howManyDays int) { //populate db with howManyDays going from today to the past
 
 	for i:= 0 ; i<howManyDays; i++ {
 		after := strconv.Itoa(2 + i) + "d"
@@ -96,6 +96,7 @@ func populateWithHistoricalData(howManyDays int) {
 		year := utils.AddLeadingZeroIfSingleDigit(strconv.Itoa(date.Year()))
 
 		price := coingecko.GetHistoricalPrice("bitcoin", "usd", coingecko.Date{Day: day, Month: month, Year: year})
+
 		predictedPrice := 0
 		
 		dayModel := models.Day{CreationDay: date, RealPrice: price, PredictedPrice: predictedPrice, Sentiment: sentiment}
