@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
-	"time"
+	"strconv"
 
 	"github.com/cdipaolo/sentiment"
 	utils "github.com/piotrksiazek/fomo-sapiens/utils"
 )
 
 var baseUrl string = "https://www.reddit.com/r/"
+
+var pushiftBaseUrl string = "https://api.pushshift.io/reddit/search/"
 
 
 type Post struct {
@@ -79,7 +81,7 @@ func (nids NamesAndIds) GetCommentsManyPosts(subrettit string) []string {
 	c := make(chan string)
 
 	for _, nid := range nids {
-		time.Sleep(time.Second * 2) //avoid being blocked by reddit for too frequent requests
+		// time.Sleep(time.Second * 2) //avoid being blocked by reddit for too frequent requests
 		go func(ch chan string, n NameAndId) {
 				getCommentsSinglePost(n, "Bitcoin", ch)
 			}(c, nid)
@@ -107,4 +109,38 @@ func GetSentiment(comments []string) int { //returns percentage of positive-sent
 	}
 	totalNumberOfComments := len(comments)
 	return int((float64(sentimentAccum)/float64(totalNumberOfComments))*100)
+}
+
+type PushiftPost struct {
+	Score int `json:"score"`
+	Body string `json:"body"`
+	Author string `json:"author"`
+}
+
+type PushiftPosts struct {
+	Data []struct {
+		PushiftPost
+	}`json:"data"`
+}
+
+func GetTopPostFromDay(d int) PushiftPost { //d says from how many days ago should the post be searched
+	after := strconv.Itoa(d) //parse d int to d in string format
+	before := strconv.Itoa(d-1)
+	url:= "https://api.pushshift.io/reddit/search/comment/?subreddit=Bitcoin&subreddit=CryptoCurrency&after=" + after + "d&before=" + before +"d&size=500"
+	body := utils.GetRequestBody(url, "GET", []utils.Header{})
+	posts := PushiftPosts{}
+	json.Unmarshal([]byte(body), &posts)
+
+	var max int
+	var maxIndex int
+	fmt.Println(len(posts.Data))
+	for index, content := range posts.Data {
+		fmt.Println(content.Body)
+		tmp := content.PushiftPost.Score
+		if tmp > max{
+			max = tmp
+			maxIndex = index
+		}
+	}
+	return posts.Data[maxIndex].PushiftPost
 }

@@ -10,6 +10,14 @@
     <div style="width: 80%; height: 50%; margin: auto">
       <canvas id="priceChart" width="400" height="400"></canvas>
     </div>
+    <div>
+      <input id="daysToFetch" type="text" />
+      <button id="chartButton" type="button">Update Chart</button>
+      <div>
+        <input id="date" type="date" id="start" />
+        <button id="submissionButton" type="button">Get top submission</button>
+      </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/index.js"></script>

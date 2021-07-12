@@ -43,6 +43,7 @@ func main() {
 	r.HandleFunc("/", indexHandler).Methods("GET")
 
 	r.HandleFunc("/getDays/{count}", getDaysHandler).Methods("GET")
+	r.HandleFunc("/getTopSubmission/{date}", getTopSubmissionHandler).Methods("GET")
 
 	http.ListenAndServe(":8080", r)
 }
@@ -78,6 +79,24 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.html", nil)
 }
 
+func getTopSubmissionHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	const layout = "2006-01-02"
+	fmt.Println(params["date"])
+	t, err := time.Parse(layout, params["date"])
+
+	utils.CheckError(err)
+
+	fmt.Println(t.Month())
+
+	howManyDaysAgo := int(time.Now().Sub(t).Hours() / 24) 
+	post := reddit.GetTopPostFromDay(howManyDaysAgo)
+	
+
+	json.NewEncoder(w).Encode(post)
+}
+
 func populateWithHistoricalData(howManyDays int) { //populate db with howManyDays going from today to the past
 
 	for i:= 0 ; i<howManyDays; i++ {
@@ -101,6 +120,6 @@ func populateWithHistoricalData(howManyDays int) { //populate db with howManyDay
 		
 		dayModel := models.Day{CreationDay: date, RealPrice: price, PredictedPrice: predictedPrice, Sentiment: sentiment}
 		db.Create(&dayModel)
-		fmt.Println("Day: ", i)
+		fmt.Println("day ", i)
 	}
 }
