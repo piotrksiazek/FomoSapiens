@@ -1,7 +1,4 @@
 const priceChart = document.getElementById("priceChart").getContext("2d");
-const sentimentChart = document
-  .getElementById("sentimentChart")
-  .getContext("2d");
 
 const defaultNumverOfDaysToFetch = 180;
 
