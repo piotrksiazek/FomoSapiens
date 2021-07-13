@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/cdipaolo/sentiment"
 	utils "github.com/piotrksiazek/fomo-sapiens/utils"
 )
 
 var baseUrl string = "https://www.reddit.com/r/"
-
-var pushiftBaseUrl string = "https://api.pushshift.io/reddit/search/"
 
 
 type Post struct {
@@ -81,7 +80,7 @@ func (nids NamesAndIds) GetCommentsManyPosts(subrettit string) []string {
 	c := make(chan string)
 
 	for _, nid := range nids {
-		// time.Sleep(time.Second * 2) //avoid being blocked by reddit for too frequent requests
+		time.Sleep(time.Second * 2) //avoid being blocked by reddit for too frequent requests
 		go func(ch chan string, n NameAndId) {
 				getCommentsSinglePost(n, "Bitcoin", ch)
 			}(c, nid)
@@ -136,7 +135,6 @@ func GetTopCommentFromDay(d int) PushiftPost { //d says from how many days ago s
 
 	//find comment with the highest score among others
 	for index, content := range posts.Data {
-		fmt.Println(content.Body)
 		tmp := content.PushiftPost.Score
 		if tmp > max{
 			max = tmp
