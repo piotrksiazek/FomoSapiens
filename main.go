@@ -83,15 +83,19 @@ func getTopSubmissionHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	const layout = "2006-01-02"
-	fmt.Println(params["date"])
+
 	t, err := time.Parse(layout, params["date"])
 
 	utils.CheckError(err)
 
-	fmt.Println(t.Month())
-
-	howManyDaysAgo := int(time.Now().Sub(t).Hours() / 24) 
-	post := reddit.GetTopCommentFromDay(howManyDaysAgo)
+	post:=reddit.PushiftPost{}
+	howManyDaysAgo := int(time.Now().Sub(t).Hours() / 24)
+	
+	if t.Day() > time.Now().Day(){
+		post = reddit.PushiftPost{Score: 0, Body: "Predict the future", Author: "Can't"}
+	} else {
+		post = reddit.GetTopCommentFromDay(howManyDaysAgo)
+	}
 	
 
 	json.NewEncoder(w).Encode(post)
